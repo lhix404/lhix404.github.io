@@ -64,6 +64,105 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-文件上传漏洞浅谈" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/11/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%B5%85%E8%B0%88/" class="article-date">
+  <time datetime="2020-11-23T14:36:25.000Z" itemprop="datePublished">2020-11-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/11/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%B5%85%E8%B0%88/">文件上传漏洞浅谈</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="漏洞原因"><a href="#漏洞原因" class="headerlink" title="漏洞原因"></a>漏洞原因</h2><p>web未对用户上传的文件进行严格的过滤，导致用户可以上传任意的文件，其中包含木马，病毒，恶意脚本或者WebShell等。</p>
+<h2 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h2><h3 id="前端限制及绕过"><a href="#前端限制及绕过" class="headerlink" title="前端限制及绕过"></a>前端限制及绕过</h3><p>有些web应用的文件上传功能，仅用JS进行了检测，如检测文件后缀名等。所以可以很轻松的进行绕过。<br>方法一：因为JS在浏览器运行，可以修改JS代码，甚至删除表单事件。<br>方法二：使文件后缀名符合白名单策略，用burp抓包，然后修改后缀名即可。（先在浏览器修改后缀名为白名单规定内容，抓包后改回原后缀名即可。）</p>
+<h3 id="服务器端检测-MIME类型"><a href="#服务器端检测-MIME类型" class="headerlink" title="服务器端检测-MIME类型"></a>服务器端检测-MIME类型</h3><table>
+<thead>
+<tr>
+<th>常见文件类型</th>
+<th>MIME类型：</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JS</td>
+<td>application/x-javascript</td>
+</tr>
+<tr>
+<td>HTML</td>
+<td>text/html</td>
+</tr>
+<tr>
+<td>JPG</td>
+<td>image/jpeg</td>
+</tr>
+<tr>
+<td>PNG</td>
+<td>image/png</td>
+</tr>
+<tr>
+<td>PDF</td>
+<td>application/pdf</td>
+</tr>
+<tr>
+<td>PHP</td>
+<td>application/octet-stream</td>
+</tr>
+<tr>
+<td>在HTTP协议中，使用content-type类型来表示文件的MIME类型。</td>
+<td></td>
+</tr>
+<tr>
+<td>所以遇到MIME类型过滤时，使用burp抓包，修改content-type类型即可。</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="服务器端检测-文件内容"><a href="#服务器端检测-文件内容" class="headerlink" title="服务器端检测-文件内容"></a>服务器端检测-文件内容</h3><p>服务器端会使用函数来对文件头进行检测。<br>构建图片木马的方法：<br>方法一：创建一个文件，写入一句话木马，在文件的开头写上GIF89a，保存文件名为 .gif。<br>方法二：图片合并：准备一个图片和一句话木马，使用copy命令进行合并。<br>例如：copy 1.jpg/b*2.php/a 1-2.jpg<br>方法三：在图片的属性中的版权写入一句话木马。<br>方法四：在一句话木马前加入图片幻数，文件保存为php文件（需要将图片幻数从16进制转换为ASCII码）。</p>
+<p>图片幻数如下所示：<br><img src="https://img-blog.csdnimg.cn/20201123222142340.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xoaXhf,size_16,color_FFFFFF,t_70#pic_center" alt="图片幻数"></p>
+<h3 id="服务器端检测-后缀名"><a href="#服务器端检测-后缀名" class="headerlink" title="服务器端检测-后缀名"></a>服务器端检测-后缀名</h3><p>服务器端检测后缀名仍然使用黑白名单策略。</p>
+<p>对于黑名单中的后缀，可以使用其他可以允许上传的类型来进行绕过。例如：php,php3,php5,phtml等。</p>
+<p>对于白名单中的后缀，我们只能上传符合白名单策略的文件名后缀。</p>
+<h3 id="截断"><a href="#截断" class="headerlink" title="截断"></a>截断</h3><p>在上传的时候，当文件系统读到【0x00】时，会认为文件已经结束。利用00截断就是利用程序员在写程序时对文件的上传路径过滤不严格，产生0x00上传截断漏洞。URL中表现为%00，00截断会导致文件上传路径的截断（及另存文件至用户所设计的路径。）</p>
+<h3 id="htaccess攻击"><a href="#htaccess攻击" class="headerlink" title=".htaccess攻击"></a>.htaccess攻击</h3><p>.htaccess是apache服务器的分布式配置文件，该文件会覆盖apache服务器的全局配置，.htaccess文件的作用域为该目录及其子目录。如果web应用允许上传.htaccess文件，那么就意味着攻击者可以更改apache的配置，这十分危险。<br>（1）首先查看apache配置是否允许.htaccess文件覆盖掉apache的配置。<br>方法一：（2）创建一个文件，将</p>
+<blockquote>
+<p>AddType application/x-httpd-php .png</p>
+</blockquote>
+<p>写入文件，并后缀名为.htaccess文件（这段代码的作用是将png文件当做php文件解析），放入测试目录。<br>（3）在同一测试目录下创建一个info.png文件，将<?php phpinfo()；?>写入文件，当我们访问文件时，info.png内的php代码就会被执行。</p>
+<p>方法二：当.htaccess文件内容如下：</p>
+<blockquote>
+<p>AddHandler php5-script php;</p>
+</blockquote>
+<p>同时我们上传的文件名中含有php关键字时，文件中的php代码就会被执行。</p>
+<p>方法三：匹配文件名<br>.htaccess文件配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;FileMatch “ajest”&gt;</span><br><span class="line">SetHandler application&#x2F;x-httpd-php</span><br><span class="line">&lt;&#x2F;FileMatch&gt;</span><br></pre></td></tr></table></figure>
+<p>此时先上传.htaccess文件，再上传ajest文件。那么服务器就会找到ajest文件，并执行其中的php代码。</p>
+<h3 id="Web服务器解析漏洞"><a href="#Web服务器解析漏洞" class="headerlink" title="Web服务器解析漏洞"></a>Web服务器解析漏洞</h3><p>Web服务器的解析漏洞较多，此处简要介绍几个，其余大家可以自行了解。<br>1.iis6.0解析漏洞<br>其实这个解析漏洞不算是漏洞，只是由于iis6.0会默认把.cer .asa .asp .cdx这些后缀的文件当做.asp文件执行<br>2.apache解析漏洞<br>hack.php.xxx.xx.x这样的文件名对于apache来说是按后缀从右到左解析的，xxx解析不了就解析xx，再解析不了，就一直向左解析直到解析到可以解析的为止，所以最终作为php文件执行了。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>个人拙见，小白一枚，如有错误，欢迎大家指出。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2020/11/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%B5%85%E8%B0%88/" data-id="ckhunmg4i0002wcu9f2nv0jib" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-XSS基础" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/11/20/XSS%E5%9F%BA%E7%A1%80/" class="article-date">
@@ -167,7 +266,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2020/11/20/XSS%E5%9F%BA%E7%A1%80/" data-id="ckhq3i77p0001hou9czgd758w" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2020/11/20/XSS%E5%9F%BA%E7%A1%80/" data-id="ckhunmg4h0001wcu9ds5gdvt5" class="article-share-link">Share</a>
       
       
     </footer>
@@ -318,7 +417,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2020/11/16/SQL%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/" data-id="ckhq3i77l0000hou920tz3bnh" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2020/11/16/SQL%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/" data-id="ckhunmg4d0000wcu96ks051o3" class="article-share-link">Share</a>
       
       
     </footer>
@@ -357,6 +456,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2020/11/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%B5%85%E8%B0%88/">文件上传漏洞浅谈</a>
+          </li>
         
           <li>
             <a href="/2020/11/20/XSS%E5%9F%BA%E7%A1%80/">XSS基础</a>
